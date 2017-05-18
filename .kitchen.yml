@@ -14,11 +14,12 @@ provisioner:
 platforms:
   - name: ubuntu-14.04
   - name: centos-7.2
+  - name: debian-8.6
 
 suites:
   - name: default
     run_list:
-      - recipe[mule-test::default]
+      - recipe[mule-test::community]
     attributes:
       aws:
         access_key: <%= ENV['AWS_ACCESS_KEY_ID'] %>
