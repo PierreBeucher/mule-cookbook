@@ -7,6 +7,7 @@ Installs Mule Community or Enterprise Edition runtimes on a server.
 
 * Ubuntu 14.04 LTS
 * Centos 7.2
+* Debian Jessie 8.6
 
 ## Usage
 
