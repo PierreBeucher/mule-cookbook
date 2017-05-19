@@ -186,12 +186,8 @@ action_class.class_eval do
                 init_heap_size: new_resource.init_heap_size,
                 max_heap_size: new_resource.max_heap_size
             )
-            action :nothing
-        end
-
-        file "#{new_resource.home}/conf/wrapper.conf.lock" do
-            action :create_if_missing
-            notifies :create, "template[#{new_resource.home}/conf/wrapper.conf]", :immediately
+            action :create
+            notifies :restart, 'service[mule]'
         end
     end
 
