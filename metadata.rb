@@ -9,6 +9,7 @@ version          '0.8.2'
 supports 'ubuntu'
 supports 'centos'
 supports 'debian'
+supports 'raspbian'
 
 depends 'compat_resource'
 
