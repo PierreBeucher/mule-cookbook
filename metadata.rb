@@ -8,8 +8,6 @@ version          '0.8.0'
 
 supports 'ubuntu'
 supports 'centos'
-supports 'debian'
-
 depends 'compat_resource'
 
 source_url 'https://github.com/hoeggsoftware/mule-cookbook' if respond_to?(:source_url)
