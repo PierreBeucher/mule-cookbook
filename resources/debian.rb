@@ -1,5 +1,4 @@
 provides :mule_instance, platform: 'debian'
-provides :mule_instance, platform: 'raspbian'
 
 property :name, String, name_attribute: true, required: true
 property :archive_name, String

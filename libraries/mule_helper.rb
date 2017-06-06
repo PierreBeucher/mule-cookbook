@@ -244,5 +244,93 @@ module Mule
         not_if "[ -e #{new_resource.home}/.mule/.agent/keystore.jks ]"
       end
     end
+    
+    
+    def setup_raspbian_armhf_wrapper(wrapper_source='https://wrapper.tanukisoftware.com/download/3.5.32/wrapper-linux-armhf-32-3.5.32.tar.gz', wrapper_version='3.5.32')
+      download_unpack_wrapper(wrapper_source, "#{new_resource.home}/additional_wrapper")
+      
+      wrapper_os = 'linux'
+      wrapper_arch = 'armhf'
+      wrapper_bits = '32'
+      wrapper_name = "wrapper-#{wrapper_os}-#{wrapper_arch}-#{wrapper_bits}-#{wrapper_version}"
+      
+      add_java_wrapper("#{new_resource.home}/additional_wrapper/#{wrapper_name}", wrapper_os, wrapper_arch, wrapper_bits, wrapper_version, true)
+      add_local_machine_mule_dist_arch('armhf') 
+    end    
+    
+    # Add a Java wrapper so and launch script to the current installation
+    # wrapper_home is the path to the wrapper package
+    # wrapper_type is the wrapper os and arch, such as inux-armhf-32
+    # override_jar : whether to override any existing wrapper-{version}.jar by the one available in the resource
+    def add_java_wrapper(wrapper_home, wrapper_os, wrapper_arch, wrapper_bits, wrapper_version, override_jar=false)
+      
+      wrapper_type = "#{wrapper_os}-#{wrapper_arch}-#{wrapper_bits}"
+      
+      remote_file "#{new_resource.home}/lib/boot/libwrapper-#{wrapper_type}.so" do
+        source "file://#{wrapper_home}/lib/libwrapper.so"
+        owner new_resource.user
+        group new_resource.group
+        mode '0775'
+        notifies :restart, "service[#{new_resource.name}]" 
+      end
+      
+      remote_file "#{new_resource.home}/lib/boot/exec/wrapper-#{wrapper_type}" do
+        source "file://#{wrapper_home}/bin/wrapper"
+        owner new_resource.user
+        group new_resource.group
+        mode '0775'
+        notifies :restart, "service[#{new_resource.name}]"
+      end   
+           
+      #execute "remove previous wrapper.jar for #{wrapper_version}" do
+      #  command "rm #{new_resource.home}/lib/boot/wrapper-*.jar"
+      #  only_if { override_jar }
+      #end
+            
+      remote_file "#{new_resource.home}/lib/boot/wrapper-#{wrapper_version}.jar" do
+        source "file://#{wrapper_home}/lib/wrapper.jar"
+        owner new_resource.user
+        group new_resource.group
+        mode '0775'
+        only_if { override_jar }
+        notifies :restart, "service[#{new_resource.name}]"
+      end
+      
+    end
+    
+    def download_unpack_wrapper(wrapper_source, dest)
+      
+      directory dest do
+        user new_resource.user
+        group new_resource.group
+        action :create
+      end
+      
+      # Download and add wrapper
+      wrapper_archive_name = File.basename(URI.parse(wrapper_source).path)
+      wrapper_archive_path = File.join(dest, wrapper_archive_name)
+      remote_file wrapper_archive_path do
+        source wrapper_source
+        user new_resource.user
+        group new_resource.group
+      end
+         
+     execute "extract wrapper #{wrapper_archive_name}" do
+       command "tar xzvf #{wrapper_archive_name} && touch #{wrapper_archive_name}.extracted"
+       cwd dest
+       not_if { File.exists?("#{dest}/#{wrapper_archive_name}.extracted") }
+     end
+     
+    end
+    
+    def add_local_machine_mule_dist_arch(as_dist_arch)
+      
+      execute 'add local machine dist arch' do
+        command 'sed -i \'s/case \"\$PROC_ARCH\" in/case \"\$PROC_ARCH\" in\n\t\t\'$(uname -m)\')\n\t\t\tDIST_ARCH=\"armhf\"\n\t\t\tbreak;;/g\'' + " #{new_resource.home}/bin/mule"
+        not_if "grep 'DIST_ARCH=\\\"#{as_dist_arch}\\\"' #{new_resource.home}/bin/mule" 
+      end
+      
+    end
+    
   end
 end
