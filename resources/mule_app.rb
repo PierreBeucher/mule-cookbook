@@ -12,11 +12,13 @@ action :deploy do
 end
 
 action :undeploy do
-  
+  undeploy_app(new_resource.mule_home, new_resource.name)
+  ensure_app_undeployed(new_resource.mule_home, new_resource.name, new_resource.deploy_timeout) if new_resource.ensure_deploy
 end
 
-action :update do
-  
+action :refresh do
+  refresh_app(new_resource.mule_home, new_resource.name)
+  ensure_app_deployed(new_resource.mule_home, new_resource.name, new_resource.deploy_timeout) if new_resource.ensure_deploy
 end
 
 action_class   do
