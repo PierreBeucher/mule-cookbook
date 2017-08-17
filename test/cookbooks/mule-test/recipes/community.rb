@@ -35,3 +35,13 @@ mule_instance 'mule-esb-2' do
     group node['mule-test']['group']
     action :create
 end
+
+remote_file "/tmp/mule/mule-example-hello.zip" do
+  source 'http://repo1.maven.org/maven2/org/mule/examples/mule-example-hello/3.4.0/mule-example-hello-3.4.0.zip'
+  action :create
+end
+
+mule_app 'mule-test-app' do
+  mule_home '/usr/local/mule-esb-test'
+  app_archive '/tmp/mule/mule-example-hello.zip'
+end
