@@ -36,12 +36,36 @@ mule_instance 'mule-esb-2' do
     action :create
 end
 
-remote_file "/tmp/mule/mule-example-hello.zip" do
-  source 'http://repo1.maven.org/maven2/org/mule/examples/mule-example-hello/3.4.0/mule-example-hello-3.4.0.zip'
-  action :create
+# Let's create a dummy app...
+dummy_app = '/tmp/mule/dummy-app.zip'
+template '/tmp/mule/mule-config.xml' do
+  source 'mule-config.xml.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  notifies :run, 'execute[create dummy app archive]', :immediately
+end
+execute 'create dummy app archive' do
+  command "zip #{dummy_app} /tmp/mule/mule-config.xml -j"
+  action :nothing
 end
 
-mule_app 'mule-test-app' do
+mule_app 'mule-test-app-deploy' do
   mule_home '/usr/local/mule-esb-test'
-  app_archive '/tmp/mule/mule-example-hello.zip'
+  app_archive dummy_app
+  action :deploy
+end
+
+mule_app 'mule-test-app-refresh' do
+  mule_home '/usr/local/mule-esb-test'
+  app_archive dummy_app
+  ensure_deploy true
+  action [ :deploy, :refresh ]
+end
+
+mule_app 'mule-test-app-undeploy' do
+  mule_home '/usr/local/mule-esb-test'
+  app_archive dummy_app
+  ensure_deploy true
+  action [ :deploy, :undeploy ]
 end
