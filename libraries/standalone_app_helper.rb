@@ -103,7 +103,7 @@ module Mule
     # Undeploy all versions for this app
     def undeploy_versions(mule_home, app_name, ensure_undeploy, versions=[], timeout=60000)
       versions.each { |v_to_undeploy|
-        mule_app "#{app_name}-#{v_to_undeploy}" do
+        standalone_app "#{app_name}-#{v_to_undeploy}" do
           app_name app_name
           version v_to_undeploy
           mule_home mule_home

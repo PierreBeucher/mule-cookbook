@@ -50,7 +50,7 @@ execute 'create dummy app archive' do
   action :nothing
 end
 
-mule_app 'mule-test-app-1.0' do
+standalone_app 'mule-test-app-1.0' do
   app_name 'mule-test-app'
   mule_home '/usr/local/mule-esb-test'
   version '1.0'
@@ -59,7 +59,7 @@ mule_app 'mule-test-app-1.0' do
   action :deploy
 end
 
-mule_app 'mule-test-app-1.1' do
+standalone_app 'mule-test-app-1.1' do
   app_name 'mule-test-app'
   mule_home '/usr/local/mule-esb-test'
   version '1.1'
@@ -68,7 +68,7 @@ mule_app 'mule-test-app-1.1' do
   action :deploy
 end
 
-mule_app 'mule-test-app-refresh' do
+standalone_app 'mule-test-app-refresh' do
   mule_home '/usr/local/mule-esb-test'
   version '1.0'
   app_archive dummy_app
@@ -76,7 +76,7 @@ mule_app 'mule-test-app-refresh' do
   action [ :deploy, :refresh ]
 end
 
-mule_app 'mule-test-app-undeploy' do
+standalone_app 'mule-test-app-undeploy' do
   mule_home '/usr/local/mule-esb-test'
   version '1.0'
   app_archive dummy_app
