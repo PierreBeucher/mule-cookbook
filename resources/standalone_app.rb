@@ -1,4 +1,4 @@
-provides :mule_app
+provides :standalone_app
 
 property :app_name, String, name_property: true
 property :version, String, required: true
