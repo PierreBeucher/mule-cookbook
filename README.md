@@ -213,6 +213,79 @@ Set this attributes to false if you don't want defaults and will set everything 
 
 More info on the Tanuki Java Service Wrapper is available at: http://wrapper.tanukisoftware.com/doc/english/introduction.html
 
+## Standalone applications
+
+This cookbook provide a resource for managing Mule standalone applications. This resource manages deployment, undeployment and refreshment of Mule Standalone applications.
+
+### Parameters
+
+- `app_name - the application name, default to resource name
+- `version` - version to manage, required
+- `mule_home` - MULE_HOME of the Mule instance to use
+- `app_archive` - path to the app archive for deployment (currently only support local file, may be download with remote_file)
+- `ensure_deploy` - whether to ensure the application is properly deployed/undeployed (i.e. anchor is created or folder deleted), default: true
+- `deploy_timeout` - timeout (ms) for application deployment when ensure_deploy is true, default: 60000
+- `undeploy_other_versions` - whether to undeploy other versions for this app_name, default: true
+- `action` - possible actions are [:deploy, :undeploy, :refresh]
+
+### Examples
+
+Will be deployed as `/opt/mule/apps/my-standalone-app-1.0`:
+
+```
+standalone_app 'my-standalone-app' do 	
+  version '1.0'
+  mule_home '/opt/mule'
+  app_archive '/tmp/my-app.zip'
+end
+```
+
+Complete example: 
+
+```
+remote_file '/tmp/my-awesome-app.zip' do
+  ...
+end
+
+standalone_app 'my-big-app' do
+  app_name` 'my-awesome-app' 	
+  version '4.2'
+  mule_home '/opt/mule'
+  app_archive '/tmp/my-awesome-app.zip'
+  ensure_deploy true
+  deploy_timeout 180000
+  undeploy_other_versions true
+  action :deploy
+end
+```
+
+### Note on version management
+
+Applications are deployed as `{app_name}-{version}`, i.e. `my-app` version `1.1` will be deployed as `my-app-1.1`. If `undeploy_other_versions` is `true` (default), any other versions found for `app_name` *will be undeployed*.
+
+For example, running:
+
+```
+standalone_app 'my-app' do 	
+  version '1.0'
+  mule_home '/opt/mule'
+  app_archive '/tmp/my-app.zip'
+end
+```
+
+And then:
+
+```
+standalone_app 'my-app' do 	
+  version '1.1' # version upgrade!
+  mule_home '/opt/mule'
+  app_archive '/tmp/my-app.zip'
+end
+```
+
+Will cause `my-app-1.0` to be undeployed in favor of `my-app-1.1`. If you want to avoir this behavior and manage versions manually, set `undeploy_other_versions` to false 
+ 
+
 ## License and Authors
 
 Authors: Reed McCartney (<reed@hoegg.software>) and Ryan Hoegg (<ryan@hoegg.software>)
