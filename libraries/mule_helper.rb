@@ -164,6 +164,32 @@ module Mule
       end
     end
     
+    def install_initd_service
+      template "/etc/default/#{new_resource.name}" do
+        owner new_resource.user
+        group new_resource.group
+        source 'mule.erb'
+        cookbook 'mule'
+        mode 0644
+        variables(
+          mule_home: new_resource.home,
+          mule_user: new_resource.user,
+          mule_env:  new_resource.env
+        )
+      end
+  
+      template "/etc/init.d/#{new_resource.name}" do
+        source 'mule.init_d.erb'
+        cookbook 'mule'
+        mode 0755
+        variables(
+          mule_env: new_resource.env,
+          mule_user: new_resource.user,
+          mule_home: new_resource.home
+        )
+      end
+    end
+    
     # Look for a value in given array.
     # If not found, push the default value in the arrey
     # If found, does nothing
