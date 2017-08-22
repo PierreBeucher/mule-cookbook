@@ -9,6 +9,7 @@ Installs Mule Community or Enterprise Edition runtimes on a server.
 * Centos 7.2
 * Centos 6.7
 * Debian Jessie 8.6
+* Raspbian Jessie
 
 ## Usage
 
