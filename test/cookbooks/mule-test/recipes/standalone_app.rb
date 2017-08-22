@@ -11,7 +11,7 @@ end
 execute 'create dummy app archive' do
   command "zip #{dummy_app} /tmp/mule/mule-config.xml -j"
   action :run
-  not_if ::File.file?(dummy_app)
+  not_if { ::File.file?(dummy_app) }
 end
 
 standalone_app 'mule-test-app-1.0' do
